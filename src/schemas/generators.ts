@@ -57,7 +57,7 @@ export const generateStringSchema = (input: GenerateBaseSchemaProps) => {
   return schema;
 };
 
-export const generateNumericStringSchema = (input: GenerateBaseSchemaProps){
+export const generateNumericStringSchema = (input: GenerateBaseSchemaProps) =>{
   const {
     fieldName,
     fixedLength,
@@ -101,5 +101,32 @@ export const generateDateString = (input: GenerateBaseSchemaProps)=>{
   } = input;
 
   const name = fieldName || "Date";
-  let dateSchema = z.date
+  let dateSchema = z.date({
+    error:(iss)=>{
+      return iss.input === undefined
+      ? requiredErrorMessage || `${name} is required.`
+      : invalidTypeErrorMessage || `Invalid ${name}.`
+    }
+  })
+  if(max){
+    const maxDate = new Date(max);
+    dateSchema = dateSchema.max(
+      new Date(maxDate),
+      maxErrorMessage || `${name} must be before ${new Date(maxDate).toDateString()}`
+    )
+  }
+  if(min){
+    const minDate = new Date(min);
+    dateSchema = dateSchema.min(
+      new Date(minDate),
+      minErrorMessage || `${name} must be after ${new Date(min).toDateString()}`
+    )
+  }
+  return z.preprocess((arg) =>{
+    if(typeof arg == "string" || arg instanceof Date){
+      return new Date(arg)
+    }else{
+      return arg;
+    }
+  }, dateSchema)
 }
