@@ -4,6 +4,7 @@ import { BadRequest } from "./utils/custom-errors";
 import { authGuard } from "./middleware/auth";
 
 import appConfig from "./config";
+import { DroneModelSchema, DroneStateSchema } from "./schemas/shared";
 
 const app = express();
 
@@ -11,9 +12,14 @@ app.use(express.json());
 
 app.get("/test-errors", (req, res) => {
   try {
-    res.send("Testing");
-    console.log("I am catching an error");
-    throw new BadRequest("This drone is too heavy");
+    const result3 = DroneStateSchema.safeParse("SLEEPING");
+    if (!result3.success) {
+      console.log(
+        "❌ Error caught correctly:",
+        result3.error.issues
+      );
+      res.send("Testing");
+    }
   } catch (error: any) {
     console.log("Caught the error!");
     console.log("Message: ", error.message);
