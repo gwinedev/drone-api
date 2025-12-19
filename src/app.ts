@@ -5,25 +5,29 @@ import { authGuard } from "./middleware/auth";
 
 import appConfig from "./config";
 import { DroneModelSchema, DroneStateSchema } from "./schemas/shared";
+import { RegisterDroneInput, RegisterDroneSchema } from "./schemas/drones";
 
 const app = express();
 
 app.use(express.json());
 
 app.get("/test-errors", (req, res) => {
-  try {
-    const result3 = DroneStateSchema.safeParse("SLEEPING");
-    if (!result3.success) {
-      console.log(
-        "❌ Error caught correctly:",
-        result3.error.issues
-      );
-      res.send("Testing");
-    }
-  } catch (error: any) {
-    console.log("Caught the error!");
-    console.log("Message: ", error.message);
-  }
+  const goodDrone: RegisterDroneInput = {
+    serialNumber: "DRONE-001",
+    model: "LIGHTWEIGHT",
+    weightLimit: 900,
+    batteryCapacity: 85,
+  };
+
+  const result = RegisterDroneSchema.safeParse(goodDrone);
+if (!result.success) {
+  console.log("❌ Caught errors:");
+  // This loop shows us exactly what went wrong
+  result.error.issues.forEach(issue => {
+    console.log(`- [${issue.path}]: ${issue.message}`);
+  });
+  res.send("Testing");
+}
 });
 
 app.get("/secret-mission", authGuard, (req, res) => {
