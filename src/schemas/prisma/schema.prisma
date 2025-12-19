@@ -1,0 +1,52 @@
+datasource db{
+    provider = "postgresql"
+    url = env("DATABASE_URL")
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model Drone {
+    id String @id @default(cuid())
+    serialNumber String @unique
+    model DroneModel
+    weightLimit Int
+    batteryCapacity Int
+    state DroneState @default(IDLE)
+
+medications Medication[]
+
+createdAt DateTime @default(now())
+updatedAt DateTime @updatedAt
+}
+
+enum DroneModel {
+    LIGHTWEIGHT
+    MIDDLEWEIGHT
+    CRUISEWEIGHT
+    HEAVYWEIGHT
+}
+
+enum DroneState {
+    IDLE
+    LOADING
+    LOADED
+    DELIVERING
+    DELIVERED
+    RETURNING
+}
+
+model Medication {
+    id String @id @default(cuid())
+    name String
+    weight Int
+    code String @unique
+    image String
+
+    // Link the medication to a specific Drone
+    drone Drone? @relation(fields: [droneId], references: [id])
+    droneId String?
+
+    createdAt DateTime @default(now())
+}
