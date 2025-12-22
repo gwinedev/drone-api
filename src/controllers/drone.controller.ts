@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { RegisterDroneSchema } from "../schemas/drones";
-import { DroneRepository } from "../repositories/drone.repository";
 import { BadRequest } from "../utils/custom-errors";
+import { DroneService } from "../services/drones/drone.service";
 
 export const DroneController = {
   register: async (req: Request, res: Response, next: NextFunction) => {
@@ -10,19 +10,9 @@ export const DroneController = {
 
       if (!validation.success) {
         // take the first error Zod finds
-        const firstError = validation.error.issues[0].message;
-        throw new BadRequest(firstError);
+        throw new BadRequest(validation.error.issues[0].message);
       }
-      const existingDrone = await DroneRepository.findBySerialNumber(
-        validation.data.serialNumber
-      );
-      if (existingDrone) {
-        throw new BadRequest(
-          "A drone with the same serial number is already in the fleet!"
-        );
-      }
-      // tell the librarian to save it
-      const newDrone = await DroneRepository.register(validation.data);
+      const newDrone = await DroneService.registerDrone(validation.data);
       return res.status(201).json({
         message: "Drone registered successfully!",
         data: newDrone,
