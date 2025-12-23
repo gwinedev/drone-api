@@ -22,4 +22,27 @@ export const DroneRepository = {
       where: { serialNumber },
     });
   },
+
+  async findById(id: string) {
+    return prisma.drone.findUnique({
+      where: { id },
+      include: { medications: true },
+    });
+  },
+
+  async addMedicationToDrone(droneId: string, medData: any) {
+    return await prisma.medication.create({
+      data: {
+        ...medData,
+        droneId: droneId,
+      },
+    });
+  },
+
+  async updateStatus(id: string, state: any) {
+    return await prisma.drone.update({
+      where: { id },
+      data: { state },
+    });
+  },
 };

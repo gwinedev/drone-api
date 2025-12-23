@@ -11,7 +11,7 @@ export const LoadMedicationSchema = z.object({
   weight: z.number().min(1, "Medication must weigh at least 1g"),
   code: z
     .string()
-    .min(1, "Cde must be UPPERCASE letters, munbers, and '_'only"),
+    .min(1, "Code must be UPPERCASE letters, munbers, and '_'only"),
 image: z.string().url("Must be a valid image URL")
 });
 
