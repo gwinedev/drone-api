@@ -5,5 +5,6 @@ import { authGuard } from "../middleware/auth";
 const droneRouter = Router();
 
 droneRouter.post("/register", authGuard, DroneController.register);
+droneRouter.post("/:id/load", authGuard, DroneController.loadMedication);
 
 export default droneRouter;
